@@ -68,4 +68,15 @@ export default class GameOverScene extends Phaser.Scene {
       });
     });
   }
+
+  update(time: number, delta: number) {
+    // Smooth camera sway (Hotline Miami style)
+    const swaySpeed = 0.0015;
+    const swayAmount = 8;
+    const rotAmount = 0.015;
+
+    this.cameras.main.scrollX = Math.sin(time * swaySpeed) * swayAmount;
+    this.cameras.main.scrollY = Math.cos(time * swaySpeed * 0.8) * swayAmount;
+    this.cameras.main.rotation = Math.sin(time * swaySpeed * 0.5) * rotAmount;
+  }
 }

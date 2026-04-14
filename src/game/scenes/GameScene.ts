@@ -41,12 +41,10 @@ export default class GameScene extends Phaser.Scene {
     super('GameScene');
   }
 
-  private playSound(key: string, volume: number = 1, pan: number = 0) {
-    // TODO: Replace with actual Phaser sound playing when assets are available
-    // if (this.cache.audio.exists(key)) {
-    //   this.sound.play(key, { volume, pan });
-    // }
-    // console.log(`[Sound] Play: ${key} | Vol: ${volume.toFixed(2)} | Pan: ${pan.toFixed(2)}`);
+  private playSound(key: string, volume: number = 1, pan: number = 0, loop = false) {
+    if (this.cache.audio.exists(key)) {
+      this.sound.play(key, { volume, pan, loop });
+    }
   }
 
   private updateSpatialAudio(item: Phaser.Physics.Arcade.Sprite, defaultSoundKey: string) {
@@ -56,23 +54,30 @@ export default class GameScene extends Phaser.Scene {
     const volume = Math.max(0, 1 - (dist / maxDist));
     const pan = Phaser.Math.Clamp((item.x - this.player.x) / 400, -1, 1);
 
-    // TODO: Update the actual playing sound instance for this item
-    // let soundInstance = item.getData('soundInstance');
-    // if (!soundInstance && this.cache.audio.exists(soundKey)) {
-    //   soundInstance = this.sound.add(soundKey, { loop: true });
-    //   soundInstance.play();
-    //   item.setData('soundInstance', soundInstance);
-    //
-    //   item.on('destroy', () => {
-    //     soundInstance.stop();
-    //     soundInstance.destroy();
-    //   });
-    // }
-    //
-    // if (soundInstance) {
-    //   soundInstance.setVolume(volume * 0.5);
-    //   soundInstance.setPan(pan);
-    // }
+    let soundInstance = item.getData('soundInstance');
+    if (!soundInstance && this.cache.audio.exists(soundKey)) {
+      soundInstance = this.sound.add(soundKey, { loop: true });
+      soundInstance.play();
+      item.setData('soundInstance', soundInstance);
+
+      item.on('destroy', () => {
+        this.tweens.add({
+          targets: soundInstance,
+          volume: 0,
+          duration: 500,
+          ease: 'Sine.easeOut',
+          onComplete: () => {
+            soundInstance.stop();
+            soundInstance.destroy();
+          }
+        });
+      });
+    }
+
+    if (soundInstance) {
+      soundInstance.setVolume(volume * 0.5);
+      soundInstance.setPan(pan);
+    }
   }
 
   create() {
@@ -84,12 +89,17 @@ export default class GameScene extends Phaser.Scene {
     this.gameSpeed = 300;
     this.savedGameSpeed = 300;
 
+    // Reset global sound rate in case it was changed
+    if ('rate' in this.sound) {
+      (this.sound as any).rate = 1.0;
+    }
+
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.bgFar = this.add.tileSprite(400, 300, 800, 600, 'bg_grid_far');
-    this.bgNear = this.add.tileSprite(400, 300, 800, 600, 'bg_grid_near');
+    this.bgFar = this.add.tileSprite(400, 300, 900, 700, 'bg_grid_far');
+    this.bgNear = this.add.tileSprite(400, 300, 900, 700, 'bg_grid_near');
 
-    this.playSound('bgm_music', 0.4); // Loop background music
+    this.playSound('bgm_music', 0.3, 0, true); // Loop background music
 
     // Speed Lines
     this.add.particles(0, 0, 'speed_line', {
@@ -104,8 +114,8 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Platforms
-    this.ceiling = this.physics.add.staticImage(400, 16, 'platform_top');
-    this.floor = this.physics.add.staticImage(400, 584, 'platform_bottom');
+    this.ceiling = this.physics.add.staticImage(800, 16, 'platform_top');
+    this.floor = this.physics.add.staticImage(800, 584, 'platform_bottom');
 
     // Player
     this.player = this.physics.add.sprite(100, 300, 'player');
@@ -159,6 +169,7 @@ export default class GameScene extends Phaser.Scene {
     this.frozenOverlay = this.add.image(400, 300, 'frozen_overlay');
     this.frozenOverlay.setAlpha(0);
     this.frozenOverlay.setDepth(100);
+    this.frozenOverlay.setScrollFactor(0);
 
     // Input
     this.input.keyboard!.on('keydown-SPACE', this.flipGravity, this);
@@ -166,6 +177,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Score UI
     this.scoreText = this.add.text(16, 40, '⭐ 0', { fontSize: '24px', color: '#fff' });
+    this.scoreText.setScrollFactor(0);
 
     // Timers
     this.scoreTimer = this.time.addEvent({
@@ -173,9 +185,9 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         this.addScore(1);
         if (this.isFrozen) {
-          this.savedGameSpeed += 6;
+          this.savedGameSpeed += 5;
         } else {
-          this.gameSpeed += 6; // Increase speed over time
+          this.gameSpeed += 5; // Increase speed over time
         }
       },
       loop: true
@@ -194,7 +206,7 @@ export default class GameScene extends Phaser.Scene {
     this.score += points;
     this.scoreText.setText(`⭐ ${this.score}`);
 
-    if (this.score >= 6840) {
+    if (this.score >= 6400) {
       this.winGame();
       return;
     }
@@ -204,7 +216,8 @@ export default class GameScene extends Phaser.Scene {
       this.lastMilestone = currentMilestone;
 
       // Milestone
-      this.cameras.main.flash(500, 0, 255, 255);
+      this.cameras.main.flash(200, 0, 255, 255);
+      this.cameras.main.shake(300, 0.015);
       const milestoneText = this.add.text(400, 300, 'SPEED UP!', {
         fontSize: '48px', fontStyle: 'bold', color: '#00ffff',
         stroke: '#ffffff', strokeThickness: 2,
@@ -216,9 +229,9 @@ export default class GameScene extends Phaser.Scene {
         onComplete: () => milestoneText.destroy()
       });
       if (this.isFrozen) {
-        this.savedGameSpeed += 20;
+        this.savedGameSpeed += 24;
       } else {
-        this.gameSpeed += 20;
+        this.gameSpeed += 24;
       }
     }
   }
@@ -245,14 +258,17 @@ export default class GameScene extends Phaser.Scene {
 
     // Determine allowed obstacle types based on score
     const allowedTypes = [0, 1, 2, 4]; // spikes, blocks, moving blocks
-    if (this.score >= 32) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
-    if (this.score >= 60) allowedTypes.push(5); // Spinner (Neon Orange Cross)
-    if (this.score >= 102) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    // if (this.score >= 32) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    // if (this.score >= 60) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    // if (this.score >= 102) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    if (this.score >= 1) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    if (this.score >= 1) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    if (this.score >= 1) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
 
     const obstacleType = Phaser.Utils.Array.GetRandom(allowedTypes);
     const x = 850;
 
-    this.playSound('spawn_obstacle', 0.5, 1.0); // Pan right since it spawns on the right
+    this.playSound('spawn_obstacle', 0.3); // Pan right since it spawns on the right
 
     if (obstacleType === 0 || obstacleType === 1) {
       const y = isTop ? 48 : 552;
@@ -414,6 +430,7 @@ export default class GameScene extends Phaser.Scene {
     diamond.destroy();
     this.addScore(15);
     this.playSound('collect_diamond', 0.8);
+    this.cameras.main.shake(150, 0.01);
 
     const popup = this.add.text(diamond.x, diamond.y, '+15', {
       fontSize: '28px', fontStyle: 'bold', color: '#00aaff'
@@ -452,7 +469,9 @@ export default class GameScene extends Phaser.Scene {
   collectSnowflake(player: any, snowflake: any) {
     snowflake.getData('emitter')?.destroy();
     snowflake.destroy();
-    this.playSound('collect_snowflake', 0.8);
+    this.playSound('collect_snowflake', 0.4);
+
+    this.cameras.main.shake(200, 0.015);
 
     const popup = this.add.text(snowflake.x, snowflake.y, 'FREEZE!', {
       fontSize: '24px', fontStyle: 'bold', color: '#00ffff'
@@ -474,6 +493,16 @@ export default class GameScene extends Phaser.Scene {
       this.savedGameSpeed = this.gameSpeed;
       this.gameSpeed = this.gameSpeed * 0.5; // Slow down
 
+      // Slow down all sounds and music
+      if ('rate' in this.sound) {
+        this.tweens.add({
+          targets: this.sound,
+          rate: 0.5,
+          duration: 800,
+          ease: 'Sine.easeOut'
+        });
+      }
+
       this.frozenOverlay.setAlpha(0);
       this.freezeTween = this.tweens.add({
         targets: this.frozenOverlay,
@@ -489,6 +518,16 @@ export default class GameScene extends Phaser.Scene {
     this.freezeTimer = this.time.delayedCall(8000, () => {
       this.isFrozen = false;
       this.gameSpeed = this.savedGameSpeed;
+
+      // Restore sound rate
+      if ('rate' in this.sound) {
+        this.tweens.add({
+          targets: this.sound,
+          rate: 1.0,
+          duration: 500,
+          ease: 'Sine.easeIn'
+        });
+      }
 
       if (this.freezeTween) this.freezeTween.stop();
       this.tweens.add({
@@ -520,7 +559,9 @@ export default class GameScene extends Phaser.Scene {
   collectImmortal(player: any, immortal: any) {
     immortal.getData('emitter')?.destroy();
     immortal.destroy();
-    this.playSound('collect_immortal', 1.0);
+    this.playSound('collect_immortal', 0.6);
+
+    this.cameras.main.shake(200, 0.02);
 
     const popup = this.add.text(immortal.x, immortal.y, 'IMMORTAL!', {
       fontSize: '24px', fontStyle: 'bold', color: '#ff3366'
@@ -562,10 +603,12 @@ export default class GameScene extends Phaser.Scene {
   flipGravity() {
     if (this.isGameOver) return;
 
+    this.cameras.main.shake(100, 0.005);
+
     if (this.player.flipY) {
-      this.playSound('gravity_switch_off', 0.7);
+      this.playSound('gravity_switch_off', 0.1);
     } else {
-      this.playSound('gravity_switch_on', 0.7);
+      this.playSound('gravity_switch_on', 0.1);
     }
 
     const body = this.player.body as Phaser.Physics.Arcade.Body;
@@ -603,6 +646,14 @@ export default class GameScene extends Phaser.Scene {
   winGame() {
     if (this.isGameOver) return;
     this.isGameOver = true;
+
+    // Stop all looping sounds (like bgm and obstacles)
+    this.sound.stopAll();
+
+    // Reset sound rate immediately on win
+    if ('rate' in this.sound) {
+      (this.sound as any).rate = 1.0;
+    }
 
     this.playSound('game_win', 1.0);
 
@@ -645,15 +696,24 @@ export default class GameScene extends Phaser.Scene {
   }
 
   hitObstacle() {
+    return
     if (this.isImmortal) return;
     if (this.isGameOver) return;
     this.isGameOver = true;
 
-    this.playSound('player_die', 1.0);
+    // Stop all looping sounds (like bgm and obstacles)
+    this.sound.stopAll();
+
+    // Reset sound rate immediately on death
+    if ('rate' in this.sound) {
+      (this.sound as any).rate = 1.0;
+    }
+
+    this.playSound('player_die', 0.8);
 
     this.physics.pause();
     this.player.setVisible(false);
-    this.cameras.main.shake(400, 0.03);
+    // this.cameras.main.shake(400, 0.03);
     this.cameras.main.flash(300, 255, 0, 0);
     this.scoreTimer.remove();
     if (this.spawnTimer) this.spawnTimer.remove();
@@ -692,6 +752,14 @@ export default class GameScene extends Phaser.Scene {
 
   update(time: number, delta: number) {
     if (this.isGameOver) return;
+
+    const swaySpeed = 0.0015;
+    const swayAmount = 8;
+    const rotAmount = 0.015;
+
+    this.cameras.main.scrollX = Math.sin(time * swaySpeed) * swayAmount;
+    this.cameras.main.scrollY = Math.cos(time * swaySpeed * 0.2) * swayAmount;
+    this.cameras.main.rotation = Math.sin(time * swaySpeed * 0.2) * rotAmount;
 
     // Player movement sound (mocked as continuous hum/footsteps)
     // this.playSound('player_move', 0.2);

@@ -6,7 +6,10 @@
   "browserslist": "> 0.25%, last 2 versions, not dead",
   "scripts": {
     "dev": "node log.js dev &parcel index.html --no-cache --config ./parcel/.parcel.dev --open",
-    "build": "node log.js build &parcel build index.html --public-url _relativeroute_ --no-source-maps --log-level error --config ./parcel/.parcel.prod",
+    "build-app": "node log.js build &parcel build index.html --public-url _relativeroute_ --no-source-maps --log-level error --config ./parcel/.parcel.prod",
+    "copy-assets": "cp -r public/assets dist/",
+    "build": "npm run build-app && npm run copy-assets",
+    "serve": "python3 -m http.server 4000 -d dist",
     "dev-nolog": "parcel index.html --no-cache --config ./parcel/.parcel.dev --open",
     "build-nolog": "parcel build index.html --public-url _relativeroute_ --no-source-maps --log-level error --config ./parcel/.parcel.prod"
   },

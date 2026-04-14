@@ -11,8 +11,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.add.tileSprite(400, 300, 800, 600, 'bg_grid_far');
-    this.add.tileSprite(400, 300, 800, 600, 'bg_grid_near');
+    this.add.tileSprite(400, 300, 900, 700, 'bg_grid_far');
+    this.add.tileSprite(400, 300, 900, 700, 'bg_grid_near');
 
     // Title
     this.add.text(width / 2, height / 2 - 80, 'GRAVITY FLIP', {
@@ -48,5 +48,16 @@ export default class MainMenuScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown-SPACE', () => {
       this.scene.start('GameScene');
     });
+  }
+
+  update(time: number, delta: number) {
+    // Smooth camera sway (Hotline Miami style)
+    const swaySpeed = 0.0015;
+    const swayAmount = 8;
+    const rotAmount = 0.015;
+
+    this.cameras.main.scrollX = Math.sin(time * swaySpeed) * swayAmount;
+    this.cameras.main.scrollY = Math.cos(time * swaySpeed * 0.8) * swayAmount;
+    this.cameras.main.rotation = Math.sin(time * swaySpeed * 0.5) * rotAmount;
   }
 }

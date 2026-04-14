@@ -12,8 +12,8 @@ export default class BootScene extends Phaser.Scene {
     // Player (Neon Cyan)
     graphics.lineStyle(2, 0x00ffff, 1);
     graphics.fillStyle(0x004488, 1);
-    graphics.fillRect(0, 0, 32, 32);
-    graphics.strokeRect(0, 0, 32, 32);
+    graphics.fillRect(1, 1, 30, 30);
+    graphics.strokeRect(1, 1, 30, 30);
     graphics.fillStyle(0xffffff, 1);
     graphics.fillRect(20, 8, 6, 6); // Eye
     graphics.generateTexture('player', 32, 32);
@@ -23,9 +23,9 @@ export default class BootScene extends Phaser.Scene {
     graphics.lineStyle(2, 0xff0055, 1);
     graphics.fillStyle(0x880022, 1);
     graphics.beginPath();
-    graphics.moveTo(16, 0);
-    graphics.lineTo(32, 32);
-    graphics.lineTo(0, 32);
+    graphics.moveTo(16, 1);
+    graphics.lineTo(31, 31);
+    graphics.lineTo(1, 31);
     graphics.closePath();
     graphics.fillPath();
     graphics.strokePath();
@@ -36,9 +36,9 @@ export default class BootScene extends Phaser.Scene {
     graphics.lineStyle(2, 0xff0055, 1);
     graphics.fillStyle(0x880022, 1);
     graphics.beginPath();
-    graphics.moveTo(0, 0);
-    graphics.lineTo(32, 0);
-    graphics.lineTo(16, 32);
+    graphics.moveTo(1, 1);
+    graphics.lineTo(31, 1);
+    graphics.lineTo(16, 31);
     graphics.closePath();
     graphics.fillPath();
     graphics.strokePath();
@@ -48,43 +48,43 @@ export default class BootScene extends Phaser.Scene {
     // Block (Neon Orange)
     graphics.lineStyle(2, 0xffaa00, 1);
     graphics.fillStyle(0x885500, 1);
-    graphics.fillRect(0, 0, 32, 64);
-    graphics.strokeRect(0, 0, 32, 64);
+    graphics.fillRect(1, 1, 30, 62);
+    graphics.strokeRect(1, 1, 30, 62);
     graphics.generateTexture('block', 32, 64);
     graphics.clear();
 
     // Block Vertical Moving (Neon Green)
     graphics.lineStyle(2, 0x00ff00, 1);
     graphics.fillStyle(0x005500, 1);
-    graphics.fillRect(0, 0, 32, 64);
-    graphics.strokeRect(0, 0, 32, 64);
+    graphics.fillRect(1, 1, 30, 62);
+    graphics.strokeRect(1, 1, 30, 62);
     graphics.generateTexture('block_green', 32, 64);
     graphics.clear();
 
     // Platform Ceiling
-    graphics.lineStyle(2, 0x00ffcc, 1);
+    // graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 800, 32);
-    graphics.strokeRect(0, 0, 800, 32);
-    graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillRect(0, 0, 1600, 32);
+    graphics.strokeRect(0, 0, 1596, 30);
+    // graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
-    graphics.moveTo(0, 32);
-    graphics.lineTo(800, 32);
+    graphics.moveTo(0, 30);
+    graphics.lineTo(1600, 30);
     graphics.strokePath();
-    graphics.generateTexture('platform_top', 800, 32);
+    graphics.generateTexture('platform_top', 1600, 32);
     graphics.clear();
 
     // Platform Floor
-    graphics.lineStyle(2, 0x00ffcc, 1);
+    // graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 800, 32);
-    graphics.strokeRect(0, 0, 800, 32);
-    graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillRect(0, 0, 1600, 32);
+    graphics.strokeRect(0, 0, 1596, 30);
+    // graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
-    graphics.moveTo(0, 0);
-    graphics.lineTo(800, 0);
+    graphics.moveTo(0, 1);
+    graphics.lineTo(1600, 1);
     graphics.strokePath();
-    graphics.generateTexture('platform_bottom', 800, 32);
+    graphics.generateTexture('platform_bottom', 1600, 32);
     graphics.clear();
 
     // Enemy (Neon Purple Sawblade)
@@ -135,10 +135,10 @@ export default class BootScene extends Phaser.Scene {
     // Spinner (Neon Orange Cross)
     graphics.lineStyle(2, 0xff5500, 1);
     graphics.fillStyle(0xaa2200, 1);
-    graphics.fillRect(28, 0, 8, 64);
-    graphics.fillRect(0, 28, 64, 8);
-    graphics.strokeRect(28, 0, 8, 64);
-    graphics.strokeRect(0, 28, 64, 8);
+    graphics.fillRect(28, 1, 8, 62);
+    graphics.fillRect(1, 28, 62, 8);
+    graphics.strokeRect(28, 1, 8, 62);
+    graphics.strokeRect(1, 28, 62, 8);
     graphics.generateTexture('spinner', 64, 64);
     graphics.clear();
 
@@ -194,19 +194,19 @@ export default class BootScene extends Phaser.Scene {
 
     // Frozen Overlay
     graphics.fillStyle(0x00ffff, 0.05);
-    graphics.fillRect(0, 0, 800, 600);
+    graphics.fillRect(0, 0, 900, 700);
     graphics.lineStyle(15, 0x00ffff, 0.3);
-    graphics.strokeRect(7, 7, 786, 586);
+    graphics.strokeRect(57, 57, 786, 586);
     graphics.fillStyle(0x00ffff, 0.4);
-    for(let i = 0; i < 800; i += 30) {
-      graphics.fillTriangle(i, 0, i + 15, Math.random() * 40 + 20, i + 30, 0);
-      graphics.fillTriangle(i, 600, i + 15, 600 - (Math.random() * 40 + 20), i + 30, 600);
+    for(let i = 50; i < 850; i += 30) {
+      graphics.fillTriangle(i, 50, i + 15, 50 + Math.random() * 40 + 20, i + 30, 50);
+      graphics.fillTriangle(i, 650, i + 15, 650 - (Math.random() * 40 + 20), i + 30, 650);
     }
-    for(let i = 0; i < 600; i += 30) {
-      graphics.fillTriangle(0, i, Math.random() * 40 + 20, i + 15, 0, i + 30);
-      graphics.fillTriangle(800, i, 800 - (Math.random() * 40 + 20), i + 15, 800, i + 30);
+    for(let i = 50; i < 650; i += 30) {
+      graphics.fillTriangle(50, i, 50 + Math.random() * 40 + 20, i + 15, 50, i + 30);
+      graphics.fillTriangle(850, i, 850 - (Math.random() * 40 + 20), i + 15, 850, i + 30);
     }
-    graphics.generateTexture('frozen_overlay', 800, 600);
+    graphics.generateTexture('frozen_overlay', 900, 700);
     graphics.clear();
 
     // Background Grid Far
@@ -230,6 +230,28 @@ export default class BootScene extends Phaser.Scene {
     }
     graphics.generateTexture('bg_grid_near', 128, 128);
     graphics.clear();
+
+    // Load sounds
+    this.load.audio('collect_snowflake', 'assets/sound/collect_snowflake.wav');
+    this.load.audio('collect_diamond', 'assets/sound/collect_diamond.wav');
+    this.load.audio('welcome', 'assets/sound/welcome.wav');
+    this.load.audio('player_die', 'assets/sound/player_die.wav');
+    this.load.audio('bgm_music', 'assets/sound/bgm_music_3.mp3');
+    this.load.audio('game_win', 'assets/sound/game_win.wav');
+    this.load.audio('collect_star', 'assets/sound/collect_coin.mp3');
+    this.load.audio('collect_immortal', 'assets/sound/collect_immortal.wav');
+    this.load.audio('spawn_obstacle', 'assets/sound/spawn_obstacle.ogg');
+    this.load.audio('sound_spike', 'assets/sound/sound_spike.wav');
+    this.load.audio('sound_block', 'assets/sound/sound_block.wav');
+    this.load.audio('sound_moving_block', 'assets/sound/sound_moving_block.wav');
+    this.load.audio('sound_vertical_block', 'assets/sound/sound_vertical_block.wav');
+    this.load.audio('sound_sawblade', 'assets/sound/sound_sawblade.mp3');
+    this.load.audio('sound_spinner', 'assets/sound/sound_spinner.wav');
+    this.load.audio('obstacle_hum', 'assets/sound/obstacle_hum.wav');
+    this.load.audio('sawblade_hum', 'assets/sound/sound_sawblade.mp3');
+    this.load.audio('gravity_switch_on', 'assets/sound/gravity_switch_on.wav');
+    this.load.audio('gravity_switch_off', 'assets/sound/gravity_switch_off.wav');
+    this.load.audio('spinner_hum', 'assets/sound/spinner_hum.mp3');
   }
 
   create() {
