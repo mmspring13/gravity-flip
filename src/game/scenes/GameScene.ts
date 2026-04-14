@@ -258,12 +258,12 @@ export default class GameScene extends Phaser.Scene {
 
     // Determine allowed obstacle types based on score
     const allowedTypes = [0, 1, 2, 4]; // spikes, blocks, moving blocks
-    // if (this.score >= 32) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
-    // if (this.score >= 60) allowedTypes.push(5); // Spinner (Neon Orange Cross)
-    // if (this.score >= 102) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
-    if (this.score >= 1) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
-    if (this.score >= 1) allowedTypes.push(5); // Spinner (Neon Orange Cross)
-    if (this.score >= 1) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    if (this.score >= 24) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    if (this.score >= 58) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    if (this.score >= 92) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    // if (this.score >= 1) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    // if (this.score >= 1) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    // if (this.score >= 1) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
 
     const obstacleType = Phaser.Utils.Array.GetRandom(allowedTypes);
     const x = 850;
@@ -696,7 +696,6 @@ export default class GameScene extends Phaser.Scene {
   }
 
   hitObstacle() {
-    return
     if (this.isImmortal) return;
     if (this.isGameOver) return;
     this.isGameOver = true;
