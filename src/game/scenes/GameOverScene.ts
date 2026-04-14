@@ -61,7 +61,7 @@ export default class GameOverScene extends Phaser.Scene {
     restartBtn.on('pointerdown', () => {
       this.scene.start('GameScene');
     });
-    
+
     this.time.delayedCall(500, () => {
       this.input.keyboard!.once('keydown-SPACE', () => {
         this.scene.start('GameScene');

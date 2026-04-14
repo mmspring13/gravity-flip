@@ -6,8 +6,30 @@ export default class BootScene extends Phaser.Scene {
   }
 
   preload() {
+    // Load sounds
+    this.load.audio('collect_snowflake', 'assets/sound/collect_snowflake.wav');
+    this.load.audio('collect_diamond', 'assets/sound/collect_diamond.wav');
+    this.load.audio('welcome', 'assets/sound/welcome.wav');
+    this.load.audio('player_die', 'assets/sound/player_die.wav');
+    this.load.audio('bgm_music', 'assets/sound/bgm_music_3.mp3');
+    this.load.audio('game_win', 'assets/sound/game_win.wav');
+    this.load.audio('collect_star', 'assets/sound/collect_coin.mp3');
+    this.load.audio('collect_immortal', 'assets/sound/collect_immortal.wav');
+    this.load.audio('spawn_obstacle', 'assets/sound/spawn_obstacle.ogg');
+    this.load.audio('sound_spike', 'assets/sound/sound_spike.wav');
+    this.load.audio('sound_block', 'assets/sound/sound_block.wav');
+    this.load.audio('sound_moving_block', 'assets/sound/sound_moving_block.wav');
+    this.load.audio('sound_vertical_block', 'assets/sound/sound_vertical_block.wav');
+    this.load.audio('sound_sawblade', 'assets/sound/sound_sawblade.mp3');
+    this.load.audio('sound_spinner', 'assets/sound/sound_spinner.wav');
+    this.load.audio('obstacle_hum', 'assets/sound/obstacle_hum.wav');
+    this.load.audio('sawblade_hum', 'assets/sound/sound_sawblade.mp3');
+    this.load.audio('gravity_switch_on', 'assets/sound/gravity_switch_on.wav');
+    this.load.audio('gravity_switch_off', 'assets/sound/gravity_switch_off.wav');
+    this.load.audio('spinner_hum', 'assets/sound/spinner_hum.mp3');
+
     // Generate graphics for the game
-    const graphics = this.make.graphics({ x: 0, y: 0, add: false });
+    const graphics = this.make.graphics({ x: 0, y: 0 });
 
     // Player (Neon Cyan)
     graphics.lineStyle(2, 0x00ffff, 1);
@@ -62,29 +84,29 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Platform Ceiling
-    // graphics.lineStyle(2, 0x00ffcc, 1);
+    graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 1600, 32);
-    graphics.strokeRect(0, 0, 1596, 30);
-    // graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillRect(0, 0, 2100, 240);
+    graphics.strokeRect(1, 1, 2098, 238);
+    graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
-    graphics.moveTo(0, 30);
-    graphics.lineTo(1600, 30);
+    graphics.moveTo(0, 239);
+    graphics.lineTo(2100, 239);
     graphics.strokePath();
-    graphics.generateTexture('platform_top', 1600, 32);
+    graphics.generateTexture('platform_top', 2100, 240);
     graphics.clear();
 
     // Platform Floor
-    // graphics.lineStyle(2, 0x00ffcc, 1);
+    graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 1600, 32);
-    graphics.strokeRect(0, 0, 1596, 30);
-    // graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillRect(0, 0, 2100, 240);
+    graphics.strokeRect(1, 1, 2098, 238);
+    graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
     graphics.moveTo(0, 1);
-    graphics.lineTo(1600, 1);
+    graphics.lineTo(2100, 1);
     graphics.strokePath();
-    graphics.generateTexture('platform_bottom', 1600, 32);
+    graphics.generateTexture('platform_bottom', 2100, 240);
     graphics.clear();
 
     // Enemy (Neon Purple Sawblade)
@@ -194,19 +216,19 @@ export default class BootScene extends Phaser.Scene {
 
     // Frozen Overlay
     graphics.fillStyle(0x00ffff, 0.05);
-    graphics.fillRect(0, 0, 900, 700);
+    graphics.fillRect(0, 0, 2000, 1200);
     graphics.lineStyle(15, 0x00ffff, 0.3);
-    graphics.strokeRect(57, 57, 786, 586);
+    graphics.strokeRect(50, 70, 1900, 1060);
     graphics.fillStyle(0x00ffff, 0.4);
-    for(let i = 50; i < 850; i += 30) {
-      graphics.fillTriangle(i, 50, i + 15, 50 + Math.random() * 40 + 20, i + 30, 50);
-      graphics.fillTriangle(i, 650, i + 15, 650 - (Math.random() * 40 + 20), i + 30, 650);
+    for(let i = 40; i < 1960; i += 30) {
+      graphics.fillTriangle(i, 60, i + 15, 60 + Math.random() * 40 + 20, i + 30, 60);
+      graphics.fillTriangle(i, 1140, i + 15, 1140 - (Math.random() * 40 + 20), i + 30, 1140);
     }
-    for(let i = 50; i < 650; i += 30) {
-      graphics.fillTriangle(50, i, 50 + Math.random() * 40 + 20, i + 15, 50, i + 30);
-      graphics.fillTriangle(850, i, 850 - (Math.random() * 40 + 20), i + 15, 850, i + 30);
+    for(let i = 60; i < 1140; i += 30) {
+      graphics.fillTriangle(40, i, 40 + Math.random() * 40 + 20, i + 15, 40, i + 30);
+      graphics.fillTriangle(1960, i, 1960 - (Math.random() * 40 + 20), i + 15, 1960, i + 30);
     }
-    graphics.generateTexture('frozen_overlay', 900, 700);
+    graphics.generateTexture('frozen_overlay', 2000, 1200);
     graphics.clear();
 
     // Background Grid Far
@@ -230,28 +252,6 @@ export default class BootScene extends Phaser.Scene {
     }
     graphics.generateTexture('bg_grid_near', 128, 128);
     graphics.clear();
-
-    // Load sounds
-    this.load.audio('collect_snowflake', 'assets/sound/collect_snowflake.wav');
-    this.load.audio('collect_diamond', 'assets/sound/collect_diamond.wav');
-    this.load.audio('welcome', 'assets/sound/welcome.wav');
-    this.load.audio('player_die', 'assets/sound/player_die.wav');
-    this.load.audio('bgm_music', 'assets/sound/bgm_music_3.mp3');
-    this.load.audio('game_win', 'assets/sound/game_win.wav');
-    this.load.audio('collect_star', 'assets/sound/collect_coin.mp3');
-    this.load.audio('collect_immortal', 'assets/sound/collect_immortal.wav');
-    this.load.audio('spawn_obstacle', 'assets/sound/spawn_obstacle.ogg');
-    this.load.audio('sound_spike', 'assets/sound/sound_spike.wav');
-    this.load.audio('sound_block', 'assets/sound/sound_block.wav');
-    this.load.audio('sound_moving_block', 'assets/sound/sound_moving_block.wav');
-    this.load.audio('sound_vertical_block', 'assets/sound/sound_vertical_block.wav');
-    this.load.audio('sound_sawblade', 'assets/sound/sound_sawblade.mp3');
-    this.load.audio('sound_spinner', 'assets/sound/sound_spinner.wav');
-    this.load.audio('obstacle_hum', 'assets/sound/obstacle_hum.wav');
-    this.load.audio('sawblade_hum', 'assets/sound/sound_sawblade.mp3');
-    this.load.audio('gravity_switch_on', 'assets/sound/gravity_switch_on.wav');
-    this.load.audio('gravity_switch_off', 'assets/sound/gravity_switch_off.wav');
-    this.load.audio('spinner_hum', 'assets/sound/spinner_hum.mp3');
   }
 
   create() {

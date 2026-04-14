@@ -6,8 +6,8 @@ import GameOverScene from './scenes/GameOverScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 800,
-  height: 600,
+  width: 1920,
+  height: 1080,
   parent: 'phaser-container',
   pixelArt: false,
   antialias: true,
@@ -24,14 +24,14 @@ const config: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    min: {
-      width: 400,
-      height: 300
-    },
-    max: {
-      width: 1600,
-      height: 1200
-    }
+    // min: {
+    //   width: 400,
+    //   height: 300
+    // },
+    // max: {
+    //   width: 1600,
+    //   height: 1200
+    // }
   },
   input: {
     activePointers: 1, // Optimize for single touch

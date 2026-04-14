@@ -11,8 +11,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.add.tileSprite(400, 300, 900, 700, 'bg_grid_far');
-    this.add.tileSprite(400, 300, 900, 700, 'bg_grid_near');
+    this.add.tileSprite(960, 540, 2200, 1400, 'bg_grid_far');
+    this.add.tileSprite(960, 540, 2200, 1400, 'bg_grid_near');
 
     // Title
     this.add.text(width / 2, height / 2 - 80, 'GRAVITY FLIP', {
@@ -42,10 +42,16 @@ export default class MainMenuScene extends Phaser.Scene {
     });
 
     startBtn.on('pointerdown', () => {
+      if (this.cache.audio.exists('welcome')) {
+        this.sound.play('welcome');
+      }
       this.scene.start('GameScene');
     });
 
     this.input.keyboard!.on('keydown-SPACE', () => {
+      if (this.cache.audio.exists('welcome')) {
+        this.sound.play('welcome');
+      }
       this.scene.start('GameScene');
     });
   }
