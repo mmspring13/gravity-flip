@@ -11,8 +11,8 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.add.tileSprite(480, 270, 1100, 700, 'bg_grid_far');
-    this.add.tileSprite(480, 270, 1100, 700, 'bg_grid_near');
+    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_far');
+    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_near');
 
     // Title
     this.add.text(width / 2, height / 2 - 80, 'GRAVITY FLIP', {

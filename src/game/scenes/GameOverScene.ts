@@ -17,7 +17,7 @@ export default class GameOverScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    const titleText = this.won ? 'FINISHED GAME' : 'SYSTEM FAILURE';
+    const titleText = this.won ? 'SYSTEM UNLOCKED' : 'SYSTEM FAILURE';
     const titleColor = this.won ? '#00ff00' : '#ff0055';
 
     this.add.text(width / 2, height / 2 - 100, titleText, {

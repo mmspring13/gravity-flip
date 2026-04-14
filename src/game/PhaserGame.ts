@@ -6,8 +6,8 @@ import GameOverScene from './scenes/GameOverScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 960,
-  height: 540,
+  width: 1280,
+  height: 620,
   parent: 'phaser-container',
   pixelArt: false,
   antialias: true,
