@@ -86,8 +86,8 @@ export default class GameScene extends Phaser.Scene {
     this.isImmortal = false;
     this.score = 0;
     this.lastMilestone = 0;
-    this.gameSpeed = 420;
-    this.savedGameSpeed = 420;
+    this.gameSpeed = 450;
+    this.savedGameSpeed = 450;
 
     // Reset global sound rate in case it was changed
     if ('rate' in this.sound) {
@@ -96,15 +96,15 @@ export default class GameScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.bgFar = this.add.tileSprite(960, 540, 2200, 1400, 'bg_grid_far');
-    this.bgNear = this.add.tileSprite(960, 540, 2200, 1400, 'bg_grid_near');
+    this.bgFar = this.add.tileSprite(480, 270, 1100, 700, 'bg_grid_far');
+    this.bgNear = this.add.tileSprite(480, 270, 1100, 700, 'bg_grid_near');
 
     this.playSound('bgm_music', 0.4); // Loop background music
 
     // Speed Lines
     this.add.particles(0, 0, 'speed_line', {
-      x: 2000,
-      y: { min: 250, max: 830 },
+      x: 1000,
+      y: { min: 125, max: 415 },
       speed: { min: 400, max: 800 },
       angle: 180,
       lifespan: 2000,
@@ -114,13 +114,13 @@ export default class GameScene extends Phaser.Scene {
     });
 
     // Platforms
-    this.ceiling = this.physics.add.staticImage(960, 120, 'platform_top');
-    this.floor = this.physics.add.staticImage(960, 960, 'platform_bottom');
+    this.ceiling = this.physics.add.staticImage(480, 60, 'platform_top');
+    this.floor = this.physics.add.staticImage(480, 480, 'platform_bottom');
 
     // Player
-    this.player = this.physics.add.sprite(200, 540, 'player');
+    this.player = this.physics.add.sprite(100, 270, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.gravity.y = 1200;
+    this.player.body!.gravity.y = 1500;
 
     // Particle trail
     const particles = this.add.particles(0, 0, 'player', {
@@ -166,7 +166,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.immortals, this.collectImmortal, undefined, this);
 
     // Frozen Overlay
-    this.frozenOverlay = this.add.image(960, 540, 'frozen_overlay');
+    this.frozenOverlay = this.add.image(480, 270, 'frozen_overlay');
     this.frozenOverlay.setAlpha(0);
     this.frozenOverlay.setDepth(100);
     this.frozenOverlay.setScrollFactor(0);
@@ -185,9 +185,9 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         this.addScore(1);
         if (this.isFrozen) {
-          this.savedGameSpeed += 12;
+          this.savedGameSpeed += 15;
         } else {
-          this.gameSpeed += 12; // Increase speed over time
+          this.gameSpeed += 15; // Increase speed over time
         }
       },
       loop: true
@@ -257,17 +257,17 @@ export default class GameScene extends Phaser.Scene {
 
     // Determine allowed obstacle types based on score
     const allowedTypes = [0, 1, 2, 4]; // spikes, blocks, moving blocks
-    if (this.score >= 32) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
-    if (this.score >= 63) allowedTypes.push(5); // Spinner (Neon Orange Cross)
-    if (this.score >= 98) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    if (this.score >= 24) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    if (this.score >= 46) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    if (this.score >= 91) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
 
     const obstacleType = Phaser.Utils.Array.GetRandom(allowedTypes);
-    const x = 2000;
+    const x = 1000;
 
     this.playSound('spawn_obstacle', 0.5, 1.0); // Pan right since it spawns on the right
 
     if (obstacleType === 0 || obstacleType === 1) {
-      const y = isTop ? 256 : 824;
+      const y = isTop ? 136 : 404;
       const texture = isTop ? 'spike_down' : 'spike_up';
 
       const spike1 = this.obstacles.create(x, y, texture) as Phaser.Physics.Arcade.Sprite;
@@ -281,7 +281,7 @@ export default class GameScene extends Phaser.Scene {
       }
     } else if (obstacleType === 2 || obstacleType === 4) {
       // Block
-      const y = isTop ? 272 : 808; // 240 (platform) + 32 (half of 64 height block)
+      const y = isTop ? 152 : 388; // 120 (platform) + 32 (half of 64 height block)
       const block = this.obstacles.create(x, y, 'block') as Phaser.Physics.Arcade.Sprite;
       block.setData('soundKey', obstacleType === 2 ? 'sound_block' : 'sound_moving_block');
       this.setupObstacle(block, isTop, false);
@@ -299,14 +299,14 @@ export default class GameScene extends Phaser.Scene {
       }
     } else if (obstacleType === 6) {
       // Vertical moving block (top to down)
-      const y = 272; // Start at top
+      const y = 152; // Start at top
       const block = this.obstacles.create(x, y, 'block_green') as Phaser.Physics.Arcade.Sprite;
       block.setData('soundKey', 'sound_vertical_block');
       this.setupObstacle(block, true, false);
 
       this.tweens.add({
         targets: block,
-        y: 808, // Move to bottom
+        y: 388, // Move to bottom
         duration: 1500,
         yoyo: true,
         repeat: -1,
@@ -314,7 +314,7 @@ export default class GameScene extends Phaser.Scene {
       });
     } else if (obstacleType === 5) {
       // Spinner
-      const y = Phaser.Math.Between(350, 730);
+      const y = Phaser.Math.Between(175, 365);
       const spinner = this.spinners.create(x, y, 'spinner') as Phaser.Physics.Arcade.Sprite;
       spinner.setData('soundKey', 'sound_spinner');
       spinner.setVelocityX(-this.gameSpeed);
@@ -327,7 +327,7 @@ export default class GameScene extends Phaser.Scene {
       });
     } else {
       // Flying Enemy
-      const y = Phaser.Math.Between(350, 730);
+      const y = Phaser.Math.Between(175, 365);
       const enemy = this.enemies.create(x, y, 'enemy') as Phaser.Physics.Arcade.Sprite;
       enemy.setData('soundKey', 'sound_sawblade');
       enemy.setVelocityX(-this.gameSpeed * 1.3);
@@ -337,7 +337,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Schedule next spawn
-    const delay = Phaser.Math.Between(600, 1200) * (420 / this.gameSpeed);
+    const delay = Phaser.Math.Between(600, 1200) * (450 / this.gameSpeed);
     this.spawnTimer = this.time.delayedCall(delay, this.spawnObstacle, [], this);
   }
 
@@ -354,8 +354,8 @@ export default class GameScene extends Phaser.Scene {
 
   spawnCoin() {
     if (this.isGameOver) return;
-    const x = 2000;
-    const y = Phaser.Math.Between(300, 780);
+    const x = 1000;
+    const y = Phaser.Math.Between(150, 390);
     const coin = this.coins.create(x, y, 'coin') as Phaser.Physics.Arcade.Sprite;
     coin.setVelocityX(-this.gameSpeed);
     coin.body!.setCircle(16);
@@ -405,8 +405,8 @@ export default class GameScene extends Phaser.Scene {
 
   spawnDiamond() {
     if (this.isGameOver) return;
-    const x = 2000;
-    const y = Phaser.Math.Between(300, 780);
+    const x = 1000;
+    const y = Phaser.Math.Between(150, 390);
     const diamond = this.diamonds.create(x, y, 'diamond') as Phaser.Physics.Arcade.Sprite;
     diamond.setVelocityX(-this.gameSpeed);
     diamond.body!.setCircle(16);
@@ -445,8 +445,8 @@ export default class GameScene extends Phaser.Scene {
 
   spawnSnowflake() {
     if (this.isGameOver) return;
-    const x = 2000;
-    const y = Phaser.Math.Between(300, 780);
+    const x = 1000;
+    const y = Phaser.Math.Between(150, 390);
     const snowflake = this.snowflakes.create(x, y, 'snowflake') as Phaser.Physics.Arcade.Sprite;
     snowflake.setVelocityX(-this.gameSpeed);
     snowflake.body!.setCircle(16);
@@ -533,8 +533,8 @@ export default class GameScene extends Phaser.Scene {
 
   spawnImmortal() {
     if (this.isGameOver) return;
-    const x = 2000;
-    const y = Phaser.Math.Between(300, 780);
+    const x = 1000;
+    const y = Phaser.Math.Between(150, 390);
     const immortal = this.immortals.create(x, y, 'immortal') as Phaser.Physics.Arcade.Sprite;
     immortal.setVelocityX(-this.gameSpeed);
     immortal.body!.setCircle(16);

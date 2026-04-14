@@ -86,27 +86,27 @@ export default class BootScene extends Phaser.Scene {
     // Platform Ceiling
     graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 2100, 240);
-    graphics.strokeRect(1, 1, 2098, 238);
+    graphics.fillRect(0, 0, 1100, 120);
+    graphics.strokeRect(1, 1, 1098, 118);
     graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
-    graphics.moveTo(0, 239);
-    graphics.lineTo(2100, 239);
+    graphics.moveTo(0, 119);
+    graphics.lineTo(1100, 119);
     graphics.strokePath();
-    graphics.generateTexture('platform_top', 2100, 240);
+    graphics.generateTexture('platform_top', 1100, 120);
     graphics.clear();
 
     // Platform Floor
     graphics.lineStyle(2, 0x00ffcc, 1);
     graphics.fillStyle(0x002233, 1);
-    graphics.fillRect(0, 0, 2100, 240);
-    graphics.strokeRect(1, 1, 2098, 238);
+    graphics.fillRect(0, 0, 1100, 120);
+    graphics.strokeRect(1, 1, 1098, 118);
     graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
     graphics.moveTo(0, 1);
-    graphics.lineTo(2100, 1);
+    graphics.lineTo(1100, 1);
     graphics.strokePath();
-    graphics.generateTexture('platform_bottom', 2100, 240);
+    graphics.generateTexture('platform_bottom', 1100, 120);
     graphics.clear();
 
     // Enemy (Neon Purple Sawblade)
@@ -216,19 +216,19 @@ export default class BootScene extends Phaser.Scene {
 
     // Frozen Overlay
     graphics.fillStyle(0x00ffff, 0.05);
-    graphics.fillRect(0, 0, 2000, 1200);
+    graphics.fillRect(0, 0, 1000, 600);
     graphics.lineStyle(15, 0x00ffff, 0.3);
-    graphics.strokeRect(50, 70, 1900, 1060);
+    graphics.strokeRect(25, 35, 950, 530);
     graphics.fillStyle(0x00ffff, 0.4);
-    for(let i = 40; i < 1960; i += 30) {
-      graphics.fillTriangle(i, 60, i + 15, 60 + Math.random() * 40 + 20, i + 30, 60);
-      graphics.fillTriangle(i, 1140, i + 15, 1140 - (Math.random() * 40 + 20), i + 30, 1140);
+    for(let i = 20; i < 980; i += 30) {
+      graphics.fillTriangle(i, 30, i + 15, 30 + Math.random() * 40 + 20, i + 30, 30);
+      graphics.fillTriangle(i, 570, i + 15, 570 - (Math.random() * 40 + 20), i + 30, 570);
     }
-    for(let i = 60; i < 1140; i += 30) {
-      graphics.fillTriangle(40, i, 40 + Math.random() * 40 + 20, i + 15, 40, i + 30);
-      graphics.fillTriangle(1960, i, 1960 - (Math.random() * 40 + 20), i + 15, 1960, i + 30);
+    for(let i = 30; i < 570; i += 30) {
+      graphics.fillTriangle(20, i, 20 + Math.random() * 40 + 20, i + 15, 20, i + 30);
+      graphics.fillTriangle(980, i, 980 - (Math.random() * 40 + 20), i + 15, 980, i + 30);
     }
-    graphics.generateTexture('frozen_overlay', 2000, 1200);
+    graphics.generateTexture('frozen_overlay', 1000, 600);
     graphics.clear();
 
     // Background Grid Far
