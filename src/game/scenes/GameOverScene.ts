@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { t } from '../translations';
 
 export default class GameOverScene extends Phaser.Scene {
   private score: number = 0;
@@ -17,10 +18,11 @@ export default class GameOverScene extends Phaser.Scene {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
 
-    const titleText = this.won ? 'SYSTEM UNLOCKED' : 'SYSTEM FAILURE';
+    const titleText = this.won ? t('FINISHED_GAME') : t('SYSTEM_FAILURE');
     const titleColor = this.won ? '#00ff00' : '#ff0055';
 
     this.add.text(width / 2, height / 2 - 100, titleText, {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '56px',
       color: titleColor,
       fontStyle: 'bold',
@@ -30,23 +32,27 @@ export default class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.add.text(width / 2, height / 2 - 10, `⭐ ${this.score}`, {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '32px',
       color: '#00ffff',
       shadow: { blur: 5, color: '#00ffff', fill: true }
     }).setOrigin(0.5);
 
     const bestScore = localStorage.getItem('gravityFlipBestScore') || '0';
-    this.add.text(width / 2, height / 2 + 35, `🌟 BEST: ${bestScore}`, {
+    this.add.text(width / 2, height / 2 + 35, `${t('BEST_SCORE')}${bestScore}`, {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '24px',
       color: '#ffaa00',
       shadow: { blur: 5, color: '#ffaa00', fill: true }
     }).setOrigin(0.5);
 
-    const restartBtn = this.add.text(width / 2, height / 2 + 120, '> REBOOT <', {
+    const restartBtn = this.add.text(width / 2, height / 2 + 120, t('REBOOT'), {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '28px',
       color: '#000000',
       backgroundColor: '#00ffff',
-      padding: { x: 24, y: 12 }
+      padding: { x: 24, y: 12 },
+      fontStyle: 'bold'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
 
     // Pulse animation for restart button

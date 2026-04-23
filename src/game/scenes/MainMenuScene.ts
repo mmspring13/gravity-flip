@@ -1,6 +1,10 @@
 import * as Phaser from 'phaser';
+import { t, toggleLanguage, getLanguage } from '../translations';
 
 export default class MainMenuScene extends Phaser.Scene {
+  private titleText!: Phaser.GameObjects.Text;
+  private startBtn!: Phaser.GameObjects.Text;
+
   constructor() {
     super('MainMenuScene');
   }
@@ -11,11 +15,12 @@ export default class MainMenuScene extends Phaser.Scene {
 
     // Background
     this.cameras.main.setBackgroundColor('#050510');
-    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_far');
-    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_near');
+    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_far').setTint(0x00ffff);
+    this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_near').setTint(0x00ffff);
 
     // Title
-    this.add.text(width / 2, height / 2 - 80, 'GRAVITY FLIP', {
+    this.titleText = this.add.text(width / 2, height / 2 - 80, t('TITLE'), {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '64px',
       color: '#00ffff',
       fontStyle: 'bold',
@@ -25,23 +30,41 @@ export default class MainMenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Start Button
-    const startBtn = this.add.text(width / 2, height / 2 + 60, '> START GAME <', {
+    this.startBtn = this.add.text(width / 2, height / 2 + 60, t('START_PROMPT'), {
+      fontFamily: '"Tektur", sans-serif',
       fontSize: '32px',
       color: '#000000',
       backgroundColor: '#00ffff',
-      padding: { x: 24, y: 12 }
+      padding: { x: 24, y: 12 },
+      fontStyle: 'bold'
     }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    // Language Toggle Button
+    const langBtn = this.add.text(width - 40, 40, getLanguage().toUpperCase(), {
+      fontFamily: '"Tektur", sans-serif',
+      fontSize: '24px',
+      color: '#ffffff',
+      backgroundColor: '#ff0055',
+      padding: { x: 10, y: 5 },
+      fontStyle: 'bold'
+    }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+    langBtn.on('pointerdown', () => {
+      const newLang = toggleLanguage();
+      langBtn.setText(newLang.toUpperCase());
+      this.updateTexts();
+    });
 
     // Pulse animation for start button
     this.tweens.add({
-      targets: startBtn,
+      targets: this.startBtn,
       alpha: 0.7,
       duration: 800,
       yoyo: true,
       repeat: -1
     });
 
-    startBtn.on('pointerdown', () => {
+    this.startBtn.on('pointerdown', () => {
       if (this.cache.audio.exists('welcome')) {
         this.sound.play('welcome');
       }
@@ -54,6 +77,11 @@ export default class MainMenuScene extends Phaser.Scene {
       }
       this.scene.start('GameScene');
     });
+  }
+
+  updateTexts() {
+    this.titleText.setText(t('TITLE'));
+    this.startBtn.setText(t('START_PROMPT'));
   }
 
   update(time: number, delta: number) {

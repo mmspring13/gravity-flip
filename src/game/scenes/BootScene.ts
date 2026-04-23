@@ -11,7 +11,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.audio('collect_diamond', 'assets/sound/collect_diamond.wav');
     this.load.audio('welcome', 'assets/sound/welcome.wav');
     this.load.audio('player_die', 'assets/sound/player_die.wav');
-    this.load.audio('bgm_music', 'assets/sound/bgm_music_3.mp3');
+    this.load.audio('bgm_music', 'assets/sound/bgm_music.wav');
     this.load.audio('game_win', 'assets/sound/game_win.wav');
     this.load.audio('collect_star', 'assets/sound/collect_coin.mp3');
     this.load.audio('collect_immortal', 'assets/sound/collect_immortal.wav');
@@ -27,6 +27,14 @@ export default class BootScene extends Phaser.Scene {
     this.load.audio('gravity_switch_on', 'assets/sound/gravity_switch_on.wav');
     this.load.audio('gravity_switch_off', 'assets/sound/gravity_switch_off.wav');
     this.load.audio('spinner_hum', 'assets/sound/spinner_hum.mp3');
+
+    // Biome Music
+    this.load.audio('biome_cyber', 'assets/sound/biome_cyber.mp3');
+    this.load.audio('biome_vapor', 'assets/sound/biome_vapor.wav');
+    this.load.audio('biome_toxic', 'assets/sound/biome_toxic.wav');
+    this.load.audio('biome_blood', 'assets/sound/biome_blood.mp3');
+    this.load.audio('biome_gold', 'assets/sound/biome_gold.mp3');
+
 
     // Generate graphics for the game
     const graphics = this.make.graphics({ x: 0, y: 0 });
@@ -84,11 +92,11 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Platform Ceiling
-    // graphics.lineStyle(2, 0x00ffcc, 1);
-    graphics.fillStyle(0x002233, 1);
+    graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillStyle(0x111111, 1);
     graphics.fillRect(0, 0, 1400, 120);
     graphics.strokeRect(1, 1, 1398, 118);
-    // graphics.lineStyle(2, 0xffffff, 1);
+    graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
     graphics.moveTo(0, 119);
     graphics.lineTo(1400, 119);
@@ -97,11 +105,11 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Platform Floor
-    // graphics.lineStyle(2, 0x00ffcc, 1);
-    graphics.fillStyle(0x002233, 1);
+    graphics.lineStyle(2, 0xffffff, 1);
+    graphics.fillStyle(0x111111, 1);
     graphics.fillRect(0, 0, 1400, 120);
     graphics.strokeRect(1, 1, 1398, 118);
-    // graphics.lineStyle(2, 0xffffff, 1);
+    graphics.lineStyle(2, 0xffffff, 1);
     graphics.beginPath();
     graphics.moveTo(0, 1);
     graphics.lineTo(1400, 1);
@@ -130,7 +138,7 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Speed Line
-    graphics.fillStyle(0x00ffff, 0.5);
+    graphics.fillStyle(0xffffff, 0.5);
     graphics.fillRect(0, 0, 64, 2);
     graphics.generateTexture('speed_line', 64, 2);
     graphics.clear();
@@ -232,7 +240,7 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Background Grid Far
-    graphics.lineStyle(1, 0x111122, 1);
+    graphics.lineStyle(2, 0xffffff, 0.2);
     for (let i = 0; i < 128; i += 32) {
       graphics.moveTo(i, 0);
       graphics.lineTo(i, 128);
@@ -243,7 +251,7 @@ export default class BootScene extends Phaser.Scene {
     graphics.clear();
 
     // Background Grid Near
-    graphics.lineStyle(1, 0x222244, 1);
+    graphics.lineStyle(2, 0xffffff, 0.4);
     for (let i = 0; i < 128; i += 64) {
       graphics.moveTo(i, 0);
       graphics.lineTo(i, 128);

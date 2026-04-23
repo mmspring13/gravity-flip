@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { t, dictionary } from '../translations';
 
 export default class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
@@ -32,6 +33,20 @@ export default class GameScene extends Phaser.Scene {
 
   private bgFar!: Phaser.GameObjects.TileSprite;
   private bgNear!: Phaser.GameObjects.TileSprite;
+  private ceiling!: Phaser.Physics.Arcade.StaticGroup | any;
+  private floor!: Phaser.Physics.Arcade.StaticGroup | any;
+
+  private biomes = [
+    { key: 'BIOME_CYBER', bg: '#050510', tint: 0x00ffff, music: 'biome_cyber' },
+    { key: 'BIOME_VAPOR', bg: '#1a0525', tint: 0xff00ff, music: 'biome_vapor' },
+    { key: 'BIOME_TOXIC', bg: '#051505', tint: 0x00ff00, music: 'biome_toxic' },
+    { key: 'BIOME_BLOOD', bg: '#1a0000', tint: 0xff3300, music: 'biome_blood' },
+    { key: 'BIOME_GOLD',  bg: '#151000', tint: 0xffcc00, music: 'biome_gold' }
+  ];
+  private currentTint: number = 0x00ffff;
+  private currentBgColorRGB!: Phaser.Display.Color;
+  private currentBiomeMusic: Phaser.Sound.BaseSound | null = null;
+  private speedLinesEmitter!: Phaser.GameObjects.Particles.ParticleEmitter;
   private frozenOverlay!: Phaser.GameObjects.Image;
   private freezeTween: Phaser.Tweens.Tween | null = null;
   private blinkTween: Phaser.Tweens.Tween | null = null;
@@ -81,6 +96,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    // Stop any leftover music from previous runs
+    this.sound.stopAll();
+
     this.isGameOver = false;
     this.isFrozen = false;
     this.isImmortal = false;
@@ -95,14 +113,30 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Background
-    this.cameras.main.setBackgroundColor('#050510');
-    this.bgFar = this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_far');
-    this.bgNear = this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_near');
+    this.currentTint = 0x00ffff;
+    this.currentBgColorRGB = Phaser.Display.Color.HexStringToColor('#050510');
+    this.cameras.main.setBackgroundColor(this.currentBgColorRGB);
 
-    this.playSound('bgm_music', 0.4); // Loop background music
+    this.bgFar = this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_far').setTint(this.currentTint);
+    this.bgNear = this.add.tileSprite(640, 310, 1400, 700, 'bg_grid_near').setTint(this.currentTint);
+
+    this.playSound('bgm_music', 0.3); // Loop background music
+
+    // Start first biome music
+    const firstBiome = this.biomes[0];
+    if (this.cache.audio.exists(firstBiome.music)) {
+      this.currentBiomeMusic = this.sound.add(firstBiome.music, { loop: true });
+      (this.currentBiomeMusic as any).setVolume(0);
+      this.currentBiomeMusic.play();
+      this.tweens.add({
+        targets: this.currentBiomeMusic,
+        volume: 0.6,
+        duration: 2000
+      });
+    }
 
     // Speed Lines
-    this.add.particles(0, 0, 'speed_line', {
+    this.speedLinesEmitter = this.add.particles(0, 0, 'speed_line', {
       x: 1400,
       y: { min: 125, max: 495 },
       speed: { min: 400, max: 800 },
@@ -110,17 +144,20 @@ export default class GameScene extends Phaser.Scene {
       lifespan: 2000,
       frequency: 100,
       blendMode: 'ADD',
-      alpha: { start: 0.3, end: 0 }
+      alpha: { start: 0.3, end: 0 },
+      tint: this.currentTint
     });
 
     // Platforms
-    this.ceiling = this.physics.add.staticImage(640, 60, 'platform_top');
-    this.floor = this.physics.add.staticImage(640, 560, 'platform_bottom');
+    this.ceiling = this.physics.add.staticImage(640, 60, 'platform_top').setTint(this.currentTint);
+    this.floor = this.physics.add.staticImage(640, 560, 'platform_bottom').setTint(this.currentTint);
 
     // Player
     this.player = this.physics.add.sprite(100, 310, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.gravity.y = 1200;
+    this.player.body!.gravity.y = 1500;
+    this.player.body!.setSize(22, 22);
+    this.player.body!.setOffset(5, 5);
 
     // Particle trail
     const particles = this.add.particles(0, 0, 'player', {
@@ -176,7 +213,7 @@ export default class GameScene extends Phaser.Scene {
     this.input.on('pointerdown', this.flipGravity, this);
 
     // Score UI
-    this.scoreText = this.add.text(16, 40, '⭐ 0', { fontSize: '24px', color: '#fff' });
+    this.scoreText = this.add.text(16, 40, '⭐ 0', { fontFamily: '"Tektur", sans-serif', fontSize: '24px', color: '#fff' });
     this.scoreText.setScrollFactor(0);
 
     // Timers
@@ -185,9 +222,9 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         this.addScore(1);
         if (this.isFrozen) {
-          this.savedGameSpeed += 8;
+          this.savedGameSpeed += 3;
         } else {
-          this.gameSpeed += 8; // Increase speed over time
+          this.gameSpeed += 3; // Increase speed over time
         }
       },
       loop: true
@@ -206,33 +243,109 @@ export default class GameScene extends Phaser.Scene {
     this.score += points;
     this.scoreText.setText(`⭐ ${this.score}`);
 
-    if (this.score >= 6048) {
+    if (this.score >= 1000) {
       this.winGame();
       return;
     }
 
-    const currentMilestone = Math.floor(this.score / 36);
+    const currentMilestone = Math.floor(this.score / 50);
     if (currentMilestone > this.lastMilestone) {
       this.lastMilestone = currentMilestone;
 
+      const nextBiomeIndex = currentMilestone % this.biomes.length;
+      const targetBiome = this.biomes[nextBiomeIndex];
+      this.transitionToBiome(targetBiome);
+
       // Milestone
-      this.cameras.main.flash(400, 0, 255, 255);
-      const milestoneText = this.add.text(400, 300, 'SPEED UP!', {
-        fontSize: '48px', fontStyle: 'bold', color: '#00ffff',
+      const colorStr = '#' + targetBiome.tint.toString(16).padStart(6, '0');
+      // this.cameras.main.flash(500, 255, 255, 255);
+      this.cameras.main.shake(600, 0.005);
+
+      const milestoneText = this.add.text(640, 250, `${t('ZONE_CLEARED')}\n>> ${t(targetBiome.key as keyof typeof dictionary.en)} <<`, {
+        fontFamily: '"Tektur", sans-serif', fontSize: '48px', fontStyle: 'bold', color: colorStr,
         stroke: '#ffffff', strokeThickness: 2,
-        shadow: { blur: 10, color: '#00ffff', fill: true }
+        align: 'center',
+        shadow: { blur: 15, color: colorStr, fill: true }
       }).setOrigin(0.5);
+
       this.tweens.add({
         targets: milestoneText,
-        y: 200, alpha: 0, duration: 1000,
+        y: 150, alpha: 0, duration: 2500, ease: 'Power2',
         onComplete: () => milestoneText.destroy()
       });
+
       if (this.isFrozen) {
-        this.savedGameSpeed += 14;
+        this.savedGameSpeed += 20;
       } else {
-        this.gameSpeed += 14;
+        this.gameSpeed += 20;
       }
     }
+  }
+
+  transitionToBiome(targetBiome: typeof this.biomes[0]) {
+    const startTint = this.currentTint;
+    const targetTint = targetBiome.tint;
+    const startColor = Phaser.Display.Color.ValueToColor(startTint);
+    const targetColor = Phaser.Display.Color.ValueToColor(targetTint);
+
+    const startBgColor = this.currentBgColorRGB;
+    const targetBgColor = Phaser.Display.Color.HexStringToColor(targetBiome.bg);
+
+    // Crossfade music
+    if (this.currentBiomeMusic && this.currentBiomeMusic.isPlaying) {
+      const oldMusic = this.currentBiomeMusic;
+      this.tweens.add({
+        targets: oldMusic,
+        volume: 0,
+        duration: 2000,
+        onComplete: () => {
+          oldMusic.stop();
+          oldMusic.destroy();
+        }
+      });
+    }
+
+    if (this.cache.audio.exists(targetBiome.music)) {
+      const newMusic = this.sound.add(targetBiome.music, { loop: true });
+      (newMusic as any).setVolume(0);
+      newMusic.play();
+      this.currentBiomeMusic = newMusic;
+
+      this.tweens.add({
+        targets: newMusic,
+        volume: 0.6,
+        duration: 2500
+      });
+    }
+
+    this.tweens.addCounter({
+      from: 0,
+      to: 100,
+      duration: 3000,
+      onUpdate: (tween) => {
+        const val = tween.getValue();
+        // Grid & Platform tint
+        const colorObj = Phaser.Display.Color.Interpolate.ColorWithColor(startColor, targetColor, 100, val);
+        const combinedTint = Phaser.Display.Color.GetColor(colorObj.r, colorObj.g, colorObj.b);
+        this.bgFar.setTint(combinedTint);
+        this.bgNear.setTint(combinedTint);
+        this.ceiling.setTint(combinedTint);
+        this.floor.setTint(combinedTint);
+
+        if (this.speedLinesEmitter) {
+          (this.speedLinesEmitter as any).particleTint = combinedTint;
+        }
+
+        // Background Color
+        const bgObj = Phaser.Display.Color.Interpolate.ColorWithColor(startBgColor, targetBgColor, 100, val);
+        const newBgColor = new Phaser.Display.Color(Math.round(bgObj.r), Math.round(bgObj.g), Math.round(bgObj.b));
+        this.cameras.main.setBackgroundColor(newBgColor);
+      },
+      onComplete: () => {
+        this.currentTint = targetTint;
+        this.currentBgColorRGB = targetBgColor;
+      }
+    });
   }
 
   addMagicEffect(item: Phaser.Physics.Arcade.Sprite, color: number) {
@@ -257,9 +370,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Determine allowed obstacle types based on score
     const allowedTypes = [0, 1, 2, 4]; // spikes, blocks, moving blocks
-    if (this.score >= 34) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
-    if (this.score >= 67) allowedTypes.push(5); // Spinner (Neon Orange Cross)
-    if (this.score >= 84) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
+    if (this.score >= 30) allowedTypes.push(3); // Enemy (Neon Purple Sawblade)
+    if (this.score >= 60) allowedTypes.push(5); // Spinner (Neon Orange Cross)
+    if (this.score >= 90) allowedTypes.push(6); // Block Vertical Moving (Neon Green)
 
     const obstacleType = Phaser.Utils.Array.GetRandom(allowedTypes);
     const x = 1350;
@@ -337,7 +450,7 @@ export default class GameScene extends Phaser.Scene {
     }
 
     // Schedule next spawn
-    const delay = Phaser.Math.Between(600, 1200) * (450 / this.gameSpeed);
+    const delay = Phaser.Math.Between(800, 1400) * (400 / this.gameSpeed);
     this.spawnTimer = this.time.delayedCall(delay, this.spawnObstacle, [], this);
   }
 
@@ -383,7 +496,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Floating text
     const popup = this.add.text(coin.x, coin.y, '+5', {
-      fontSize: '24px', fontStyle: 'bold', color: '#ffff00'
+      fontFamily: '"Tektur", sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ffff00'
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -428,7 +541,7 @@ export default class GameScene extends Phaser.Scene {
     this.playSound('collect_diamond', 0.8);
 
     const popup = this.add.text(diamond.x, diamond.y, '+15', {
-      fontSize: '28px', fontStyle: 'bold', color: '#00aaff'
+      fontFamily: '"Tektur", sans-serif', fontSize: '28px', fontStyle: 'bold', color: '#00aaff'
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -466,8 +579,8 @@ export default class GameScene extends Phaser.Scene {
     snowflake.destroy();
     this.playSound('collect_snowflake', 0.8);
 
-    const popup = this.add.text(snowflake.x, snowflake.y, 'FREEZE!', {
-      fontSize: '24px', fontStyle: 'bold', color: '#00ffff'
+    const popup = this.add.text(snowflake.x, snowflake.y, t('FREEZE'), {
+      fontFamily: '"Tektur", sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#00ffff'
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -554,8 +667,8 @@ export default class GameScene extends Phaser.Scene {
     immortal.destroy();
     this.playSound('collect_immortal', 1.0);
 
-    const popup = this.add.text(immortal.x, immortal.y, 'IMMORTAL!', {
-      fontSize: '24px', fontStyle: 'bold', color: '#ff3366'
+    const popup = this.add.text(immortal.x, immortal.y, t('IMMORTAL'), {
+      fontFamily: '"Tektur", sans-serif', fontSize: '24px', fontStyle: 'bold', color: '#ff3366'
     }).setOrigin(0.5);
 
     this.tweens.add({
@@ -632,7 +745,6 @@ export default class GameScene extends Phaser.Scene {
     if (this.isGameOver) return;
     this.isGameOver = true;
 
-    // Stop all looping sounds (like bgm and obstacles)
     this.sound.stopAll();
 
     // Reset sound rate immediately on win
@@ -644,7 +756,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.physics.pause();
     this.player.setVisible(false);
-    this.cameras.main.flash(600, 255, 255, 255);
+    this.cameras.main.flash(800, 255, 255, 255);
 
     this.scoreTimer.remove();
     if (this.spawnTimer) this.spawnTimer.remove();
