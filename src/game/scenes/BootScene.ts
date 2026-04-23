@@ -11,7 +11,7 @@ export default class BootScene extends Phaser.Scene {
     this.load.audio('collect_diamond', 'assets/sound/collect_diamond.wav');
     this.load.audio('welcome', 'assets/sound/welcome.wav');
     this.load.audio('player_die', 'assets/sound/player_die.wav');
-    this.load.audio('bgm_music', 'assets/sound/bgm_music.wav');
+    // this.load.audio('bgm_music', 'assets/sound/bgm_music.wav');
     this.load.audio('game_win', 'assets/sound/game_win.wav');
     this.load.audio('collect_star', 'assets/sound/collect_coin.mp3');
     this.load.audio('collect_immortal', 'assets/sound/collect_immortal.wav');
@@ -29,7 +29,19 @@ export default class BootScene extends Phaser.Scene {
     this.load.audio('spinner_hum', 'assets/sound/spinner_hum.mp3');
 
     // Biome Music
-    this.load.audio('biome_cyber', 'assets/sound/biome_cyber.mp3');
+    const biomeCyberSounds = [
+      'biohazardsopening.ogg',
+      'monastery.ogg',
+      'map2.ogg',
+      'loadsave.ogg',
+    ];
+    for (const audioBiome of biomeCyberSounds) {
+      this.load.audio(
+        audioBiome.split('.')[0],
+        'assets/sound/' + audioBiome
+      )
+    }
+    // this.load.audio('biome_cyber', 'assets/sound/' + biomeCyberSounds[Math.floor(Math.random() * biomeCyberSounds.length)]);
     this.load.audio('biome_vapor', 'assets/sound/biome_vapor.wav');
     this.load.audio('biome_toxic', 'assets/sound/biome_toxic.wav');
     this.load.audio('biome_blood', 'assets/sound/biome_blood.mp3');

@@ -37,7 +37,13 @@ export default class GameScene extends Phaser.Scene {
   private floor!: Phaser.Physics.Arcade.StaticGroup | any;
 
   private biomes = [
-    { key: 'BIOME_CYBER', bg: '#050510', tint: 0x00ffff, music: 'biome_cyber' },
+    { key: 'BIOME_CYBER', bg: '#050510', tint: 0x00ffff, music: [
+        'biohazardsopening',
+        'monastery',
+        'map2',
+        'loadsave',
+      ]
+    },
     { key: 'BIOME_VAPOR', bg: '#1a0525', tint: 0xff00ff, music: 'biome_vapor' },
     { key: 'BIOME_TOXIC', bg: '#051505', tint: 0x00ff00, music: 'biome_toxic' },
     { key: 'BIOME_BLOOD', bg: '#1a0000', tint: 0xff3300, music: 'biome_blood' },
@@ -124,8 +130,9 @@ export default class GameScene extends Phaser.Scene {
 
     // Start first biome music
     const firstBiome = this.biomes[0];
-    if (this.cache.audio.exists(firstBiome.music)) {
-      this.currentBiomeMusic = this.sound.add(firstBiome.music, { loop: true });
+    const initialMusicKey = Phaser.Math.RND.pick(firstBiome.music as string[]);
+    if (this.cache.audio.exists(initialMusicKey)) {
+      this.currentBiomeMusic = this.sound.add(initialMusicKey, { loop: true });
       (this.currentBiomeMusic as any).setVolume(0);
       this.currentBiomeMusic.play();
       this.tweens.add({
@@ -155,7 +162,7 @@ export default class GameScene extends Phaser.Scene {
     // Player
     this.player = this.physics.add.sprite(100, 310, 'player');
     this.player.setCollideWorldBounds(true);
-    this.player.body!.gravity.y = 1500;
+    this.player.body!.gravity.y = 2100;
     this.player.body!.setSize(22, 22);
     this.player.body!.setOffset(5, 5);
 
@@ -222,9 +229,9 @@ export default class GameScene extends Phaser.Scene {
       callback: () => {
         this.addScore(1);
         if (this.isFrozen) {
-          this.savedGameSpeed += 3;
+          this.savedGameSpeed += 5;
         } else {
-          this.gameSpeed += 3; // Increase speed over time
+          this.gameSpeed += 5; // Increase speed over time
         }
       },
       loop: true
